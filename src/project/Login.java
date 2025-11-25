@@ -192,7 +192,7 @@ public class Login extends javax.swing.JFrame {
                     username = txtUser.getText();
                     password = txtPass.getText();
                     String queryRegister = "INSERT into accdetails(accUsername, accPassword)" 
-                            + "VALUES ("+username+","+password+")";
+                            + "VALUES ('"+username+"','"+password+"')";
             try {
                 st.execute(queryRegister);
             } catch (SQLException ex) {

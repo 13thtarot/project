@@ -206,10 +206,14 @@ public class Register extends javax.swing.JFrame {
         String username, password;
         username = txtUser.getText();
         password = txtPass.getText();
-        String queryLogin = "SELECT * FROM accdetails where accUsername =" +username +" AND accPassword = " + password+"";
+        String queryLogin = "SELECT * FROM accdetails where accUsername = ? AND accPassword = ? ";
         try {
             pst = con.prepareStatement(queryLogin);
+            pst.setString(1, username);
+            pst.setString(2, password);
+            
             ResultSet rs = pst.executeQuery();
+            
              if(!rs.next()) {
                 JOptionPane.showMessageDialog(new JFrame(), "No Data Found");
             } else {

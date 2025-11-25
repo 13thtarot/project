@@ -4,17 +4,124 @@
  */
 package project;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.sql.Connection;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import java.sql.*;
+import javax.swing.JFrame;
+
 /**
  *
  * @author user
  */
 public class desi extends javax.swing.JFrame {
 
-    /**
-     * Creates new form desi
-     */
     public desi() {
         initComponents();
+        search.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchTableFromDB(search.getText());
+            }
+        });
+
+        try {
+            Connection();
+            loadTableData();
+
+            search.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+                public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                    searchTableFromDB(search.getText());
+                }
+
+                public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                    searchTableFromDB(search.getText());
+                }
+
+                public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                    searchTableFromDB(search.getText());
+                }
+            });
+        } catch (SQLException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    Connection con;
+    Statement st;
+    private static final String DbName = "login";
+    private static final String DbDriver = "com.mysql.cj.jdbc.Driver";
+    private static final String DbUrl = "jdbc:mysql://localhost:3306/" + DbName;
+    private static final String DbUser = "root";
+    private static final String DbPass = "";
+
+    public void Connection() throws SQLException {
+        try {
+            Class.forName(DbDriver);
+            con = DriverManager.getConnection(DbUrl, DbUser, DbPass);
+            st = con.createStatement();
+            if (con != null) {
+                System.out.println("Connection Success");
+            }
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(desi.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public void loadTableData() {
+        String sql = "SELECT Name, empID, Work FROM designator";
+
+        try (PreparedStatement pst = con.prepareStatement(sql); java.sql.ResultSet rs = pst.executeQuery()) {  // Fully qualified
+
+            DefaultTableModel model = (DefaultTableModel) jTable3.getModel();
+            model.setRowCount(0);
+
+            while (rs.next()) {
+                String name = rs.getString("Name");
+                String id = rs.getString("empID");
+                String work = rs.getString("Work");
+
+                model.addRow(new Object[]{name, id, work});
+            }
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error Loading Data: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    private void searchTableFromDB(String keyword) {
+        String sql = "select Name, empID, Work from designator "
+                + "where Name like ? OR empID like ? OR Work like ?";
+
+        try (PreparedStatement pst = con.prepareStatement(sql)) {
+            String searchPattern = "%" + keyword + "%";
+            pst.setString(1, searchPattern);
+            pst.setString(2, searchPattern);
+            pst.setString(3, searchPattern);
+
+            java.sql.ResultSet rs = pst.executeQuery();
+
+            DefaultTableModel model = (DefaultTableModel) jTable3.getModel();
+            model.setRowCount(0); // clear table
+
+            while (rs.next()) {
+                String name = rs.getString("Name");
+                String id = rs.getString("empID");
+                String work = rs.getString("Work");
+                model.addRow(new Object[]{name, id, work});
+            }
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error Searching Data: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -35,17 +142,26 @@ public class desi extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        jButton10 = new javax.swing.JButton();
-        jButton12 = new javax.swing.JButton();
+        remove = new javax.swing.JButton();
+        edit = new javax.swing.JButton();
         jButton13 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
+        j2 = new javax.swing.JTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable3 = new javax.swing.JTable();
+        j3 = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        j1 = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
+        search = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(234, 234, 234));
         setUndecorated(true);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(73, 142, 163));
         jPanel1.setPreferredSize(new java.awt.Dimension(356, 746));
@@ -129,18 +245,18 @@ public class desi extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jButton5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jButton4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(24, 24, 24)
                         .addComponent(jLabel2))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(79, 79, 79)
+                        .addGap(70, 70, 70)
                         .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(32, Short.MAX_VALUE))
-            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jButton5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jButton4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -155,10 +271,12 @@ public class desi extends javax.swing.JFrame {
                 .addComponent(jButton5)
                 .addGap(18, 18, 18)
                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 321, Short.MAX_VALUE)
                 .addComponent(jButton6)
-                .addGap(79, 79, 79))
+                .addGap(155, 155, 155))
         );
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 320, 879));
 
         jPanel4.setBackground(new java.awt.Color(153, 204, 255));
         jPanel4.setPreferredSize(new java.awt.Dimension(383, 75));
@@ -181,24 +299,28 @@ public class desi extends javax.swing.JFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(18, 18, 18)
                 .addComponent(jLabel3)
-                .addContainerGap(34, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jButton10.setText("Remove");
-        jButton10.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton10.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton10ActionPerformed(evt);
-            }
-        });
+        getContentPane().add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 0, 1048, 100));
 
-        jButton12.setText("Edit");
-        jButton12.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton12.addActionListener(new java.awt.event.ActionListener() {
+        remove.setText("Remove");
+        remove.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        remove.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton12ActionPerformed(evt);
+                removeActionPerformed(evt);
             }
         });
+        getContentPane().add(remove, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 250, -1, 20));
+
+        edit.setText("Edit");
+        edit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        edit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editActionPerformed(evt);
+            }
+        });
+        getContentPane().add(edit, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 250, -1, 20));
 
         jButton13.setText("Add");
         jButton13.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -207,88 +329,84 @@ public class desi extends javax.swing.JFrame {
                 jButton13ActionPerformed(evt);
             }
         });
+        getContentPane().add(jButton13, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 250, -1, 20));
 
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        j2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                j2ActionPerformed(evt);
             }
         });
+        getContentPane().add(j2, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 250, 170, 20));
 
         jTable3.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+
             },
             new String [] {
                 "Name", "Employee Id", "Work"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jTable3.setShowGrid(true);
         jScrollPane3.setViewportView(jTable3);
+        if (jTable3.getColumnModel().getColumnCount() > 0) {
+            jTable3.getColumnModel().getColumn(0).setResizable(false);
+            jTable3.getColumnModel().getColumn(2).setResizable(false);
+        }
+
+        getContentPane().add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 290, 781, 221));
+        getContentPane().add(j3, new org.netbeans.lib.awtextra.AbsoluteConstraints(1190, 250, 135, -1));
+
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jLabel4.setText("Name");
+        jLabel4.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jLabel4.setDisplayedMnemonicIndex(1);
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 250, -1, -1));
+
+        jLabel6.setText("Work");
+        jLabel6.setDisplayedMnemonicIndex(1);
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(1150, 250, -1, -1));
+
+        jLabel5.setText("ID");
+        jLabel5.setDisplayedMnemonicIndex(1);
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 250, -1, -1));
+
+        j1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                j1ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(j1, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 250, 170, 20));
+
+        jButton1.setText("SAVE CHANGES");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 520, 180, 40));
+
+        jLabel7.setText("Search");
+        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 160, -1, -1));
+
+        search.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchActionPerformed(evt);
+            }
+        });
+        getContentPane().add(search, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 160, 190, -1));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/HKW2.jpg"))); // NOI18N
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(280, 280, 280)
-                                .addComponent(jButton12))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(440, 440, 440)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(200, 200, 200)
-                                .addComponent(jButton13))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(200, 200, 200)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 750, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(360, 360, 360)
-                                .addComponent(jButton10))
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1032, Short.MAX_VALUE)))
-                        .addContainerGap())
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 1044, Short.MAX_VALUE)))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 829, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(150, 150, 150)
-                                .addComponent(jButton12, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(150, 150, 150)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(150, 150, 150)
-                                .addComponent(jButton13, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(190, 190, 190)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(150, 150, 150)
-                                .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 423, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(106, 106, 106)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
+        jLabel1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jLabel1.setOpaque(true);
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 100, 1100, 750));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -323,21 +441,164 @@ public class desi extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+    private void removeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton10ActionPerformed
+        int selectedRow = jTable3.getSelectedRow();
 
-    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(new JFrame(), "Please select a row to remove!");
+        }
+
+        String empID = jTable3.getValueAt(selectedRow, 1).toString();
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this row?", "Confirm Deletion",
+                 JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                String sql = "delete from designator where empID = '" + empID + "'";
+                st.executeUpdate(sql);
+
+                DefaultTableModel Model = (DefaultTableModel) jTable3.getModel();
+                Model.removeRow(selectedRow);
+
+                JOptionPane.showMessageDialog(this, "Remove Successfully");
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Error Removing Data: " + e.getMessage());
+
+            }
+        }
+    }//GEN-LAST:event_removeActionPerformed
+
+    private void editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton12ActionPerformed
+        int SelectedRow = jTable3.getSelectedRow();
+
+        if (SelectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please choose a row");
+        }
+        String name = jTable3.getValueAt(SelectedRow, 0).toString();
+        String id = jTable3.getValueAt(SelectedRow, 1).toString();
+        String work = jTable3.getValueAt(SelectedRow, 2).toString();
+
+        j1.setText(name);
+        j2.setText(id);
+        j3.setText(work);
+
+        j2.setEditable(true);
+
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to edit this row?", "Confirm edit",
+                JOptionPane.YES_NO_OPTION);
+        String empID = jTable3.getValueAt(SelectedRow, 1).toString();
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                String sql = "delete from designator where empID = '" + empID + "'";
+                st.executeUpdate(sql);
+
+                DefaultTableModel Model = (DefaultTableModel) jTable3.getModel();
+                Model.removeRow(SelectedRow);
+
+                JOptionPane.showMessageDialog(this, " Make changes from the fields ");
+
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Error Removing Data: " + e.getMessage());
+            }
+
+        } else {
+            j1.setText("");
+            j2.setText("");
+            j3.setText("");
+        }
+    }//GEN-LAST:event_editActionPerformed
 
     private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
-        // TODO add your handling code here:
+        String name = j1.getText();
+        String id = j2.getText();
+        String work = j3.getText();
+
+        if (name.isEmpty() || id.isEmpty() || work.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please Fill out all the fields!");
+            return;
+        }
+
+        try {
+            String sql = " INSERT INTO designator (Name, empID, Work) VALUES ('" + name + "','" + id + "','" + work + "')";
+            st.executeUpdate(sql);
+
+            DefaultTableModel Model = (DefaultTableModel) jTable3.getModel();
+
+            Model.addRow(new Object[]{name, id, work});
+
+            j1.setText("");
+            j2.setText("");
+            j3.setText("");
+
+            JOptionPane.showMessageDialog(this, "Data Added Successfully!");
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error adding data: " + e.getMessage());
+
+        }
     }//GEN-LAST:event_jButton13ActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void j2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_j2ActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_j2ActionPerformed
+
+    private void j1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_j1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_j1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        String name = j1.getText();
+        String id = j2.getText();
+        String work = j3.getText();
+
+        if (name.isEmpty() || id.isEmpty() || work.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill out all of the fields!");
+        }
+
+        try {
+            String checksql = "select * from designator where empID = '" + id + "'";
+            java.sql.ResultSet rs = st.executeQuery(checksql);
+
+            DefaultTableModel Model = (DefaultTableModel) jTable3.getModel();
+
+            if (rs.next()) {
+                String updateSQL = "update designator set Name='" + name + "', Work = '" + work + "' + empID = '" + id + "'";
+                st.executeUpdate(updateSQL);
+
+                int rowcount = Model.getRowCount();
+                for (int i = 0; i < rowcount; i++) {
+                    if (Model.getValueAt(i, 1).toString().equals(id)) {
+                        Model.setValueAt(name, i, 0);
+                        Model.setValueAt(work, i, 1);
+                        break;
+
+                    }
+                }
+
+                JOptionPane.showMessageDialog(this, "Record Updated Successfully");
+            } else {
+                String sql = "insert into designator (Name,empid,Work) values ('" + name + "','" + id + "','" + work + "')";
+                st.executeUpdate(sql);
+                Model.addRow(new Object[]{name, id, work});
+                JOptionPane.showMessageDialog(this, "Data added Successfully");
+            }
+
+            j1.setText("");
+            j2.setText("");
+            j3.setText("");
+
+            j2.setEditable(true);
+        } catch (SQLException a) {
+            JOptionPane.showMessageDialog(this, "Error: " + a.getMessage());
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_searchActionPerformed
 
     /**
      * @param args the command line arguments
@@ -375,8 +636,11 @@ public class desi extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton10;
-    private javax.swing.JButton jButton12;
+    private javax.swing.JButton edit;
+    private javax.swing.JTextField j1;
+    private javax.swing.JTextField j2;
+    private javax.swing.JTextField j3;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton13;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -386,10 +650,15 @@ public class desi extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jTable3;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JButton remove;
+    private javax.swing.JTextField search;
     // End of variables declaration//GEN-END:variables
 }
