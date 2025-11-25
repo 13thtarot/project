@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
 import javax.swing.JFrame;
+import javax.swing.ListSelectionModel;
 
 /**
  *
@@ -24,6 +25,7 @@ public class desi extends javax.swing.JFrame {
 
     public desi() {
         initComponents();
+        jTable3.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         search.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 searchTableFromDB(search.getText());
@@ -320,7 +322,7 @@ public class desi extends javax.swing.JFrame {
                 editActionPerformed(evt);
             }
         });
-        getContentPane().add(edit, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 250, -1, 20));
+        getContentPane().add(edit, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 250, -1, 20));
 
         jButton13.setText("Add");
         jButton13.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -343,11 +345,11 @@ public class desi extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Name", "Employee Id", "Work"
+                "Name", "Worker ID", "Work"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, true
+                false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -355,9 +357,11 @@ public class desi extends javax.swing.JFrame {
             }
         });
         jTable3.setShowGrid(true);
+        jTable3.getTableHeader().setReorderingAllowed(false);
         jScrollPane3.setViewportView(jTable3);
         if (jTable3.getColumnModel().getColumnCount() > 0) {
             jTable3.getColumnModel().getColumn(0).setResizable(false);
+            jTable3.getColumnModel().getColumn(1).setResizable(false);
             jTable3.getColumnModel().getColumn(2).setResizable(false);
         }
 
